@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateReceiveMessagesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -22,7 +22,6 @@ return new class extends Migration
             $table->longText('html_message')->nullable();
             $table->string('folder_message')->nullable();
             $table->string('received_message')->nullable();
-            $table->timestamps();
         });
     }
 
@@ -33,6 +32,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('received_emails');
+        Schema::dropIfExists('receive_messages');
     }
-};
+}

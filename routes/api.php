@@ -15,4 +15,6 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::apiResource('test', EmailController::class);
+Route::get('/email/baixar', [EmailController::class, 'storeEmails']);
+Route::get('/email/listar', [EmailController::class, 'index']);
+Route::get('/email/search', [EmailController::class, 'getBy']);
