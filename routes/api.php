@@ -16,5 +16,6 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/email/baixar', [EmailController::class, 'storeEmails']);
-Route::get('/email/listar', [EmailController::class, 'index']);
-Route::get('/email/search', [EmailController::class, 'getBy']);
+Route::get('/email/listar', [EmailController::class, 'getAll']);
+Route::get('/email/procurar/{filtro}', [EmailController::class, 'filterReceived']);
+Route::get('/email/enviar', [EmailController::class, 'sendEmail']);

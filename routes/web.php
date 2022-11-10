@@ -18,5 +18,3 @@ use App\Http\Controllers\api\EmailController;
 Route::get('/', function () {
     return view('welcome');
 });
-
-Route::get('/index', [EmailController::class, 'indexs']);

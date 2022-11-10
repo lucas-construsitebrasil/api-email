@@ -6,16 +6,32 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Webklex\PHPIMAP\Client;
 use Webklex\PHPIMAP\ClientManager;
-use App\Models\Models\ReceiveMessages;
+use App\Models\ReceiveMessages;
 use Webklex\PHPIMAP\Query\WhereQuery;
 use Illuminate\Support\Facades\DB;
 use SebastianBergmann\Type\NullType;
+use Illuminate\Support\Facades\Mail;
+use App\Mail\SendEmail;
 
 class EmailController extends Controller
 {
     private $client;
 
-    public function index(){
+    public function __construct(){
+        $client = (new ClientManager($options = []))->make([
+            'host' => 'mail.construsitebrasil.com.br',
+            'port' => '993',
+            'encryption' => 'TLS',
+            'validade_cert' => true,
+            'username' => 'caio.magalhaes@construsitebrasil.com.br',
+            'password' => '01052003Cc@',
+            'protocol' => 'imap'
+        ]);
+        $client->connect();
+        $this->client = $client;
+    }
+
+    public function getAll(){
         return ReceiveMessages::all();
     }
 
@@ -40,58 +56,33 @@ class EmailController extends Controller
         }
     }
 
-    public function store(Request $request){
-        /*$received = new ReceiveMessages();
-        $received->email_id_message = $request->uid;
-        $received->subject_message = $request->subject;
-        $received->from_mail_message;
-        $received->from_fullname_message;
-        $received->html_message;
-        $received->folder_message;
-        $received->received_message;*/
-    }
-
-    public function getBy(Request $request){
-       return DB::table('receive_messages')->where($request->column, 'LIKE', "%{$request->value}%")->get();
-    }
-
-    public function show($id){
-
-    }
-
-    public function update(Request $request, $id){
-
-    }
-
-    public function destroy($id){
-        
-    }
-
-    public function __construct(){
-        $client = (new ClientManager($options = []))->make([
-            'host' => 'mail.construsitebrasil.com.br',
-            'port' => '993',
-            'encryption' => 'TLS',
-            'validade_cert' => true,
-            'username' => 'caio.magalhaes@construsitebrasil.com.br',
-            'password' => '01052003Cc@',
-            'protocol' => 'imap'
-        ]);
-        $client->connect();
-        $this->client = $client;
-    }
-
-    public function indexs(){
-        $folders = $this->client->getFolders();
-        foreach($folders as $folder) {
-            if ($folder->path == 'INBOX') {
-                $messages = $folder->messages()->all()->get();
-
-                foreach ($messages as $message){
-                    echo $message->getFlags();
-                }
-            }
+    public function filterReceived(Request $request, $filtro){
+        switch($filtro) {
+            case 'data':
+                $column = 'received_message';
+                break;
+            case 'remetente':
+                $column = 'from_fullname_message';
+                break;
+            case 'conteudo':
+                $column = 'html_message';
+                break;
         }
-        //return view('index', ['messages' => $messages]);
+        return $this->filter($column, $request->value);
+       
+    }
+
+    public function getByFilter($column, $string){
+        return DB::table('receive_messages')->where($column, 'LIKE', "%{$string}%")->get();
+    }
+    
+    public function sendEmail(Request $request){
+        $message['to_message'] = $request->destino;
+        $message['content_message'] = $request->msg;
+        $message['subject_message'] = $request->sub;
+
+        DB::table('send_messages')->insert($message);
+        Mail::to($message['to_message'])->send(new SendEmail($message['content_message'], $message['subject_message']));
+        
     }
 }
