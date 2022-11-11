@@ -56,6 +56,15 @@ class EmailController extends Controller
         }
     }
 
+    public function sendEmail(Request $request){
+        $message['to_message'] = $request->destino;
+        $message['content_message'] = $request->msg;
+        $message['subject_message'] = $request->sub;
+
+        DB::table('send_messages')->insert($message);
+        Mail::to($message['to_message'])->send(new SendEmail($message['content_message'], $message['subject_message']));
+    }
+
     public function filterReceived(Request $request, $filtro){
         switch($filtro) {
             case 'data':
@@ -68,21 +77,26 @@ class EmailController extends Controller
                 $column = 'html_message';
                 break;
         }
-        return $this->filter($column, $request->value);
-       
-    }
-
-    public function getByFilter($column, $string){
-        return DB::table('receive_messages')->where($column, 'LIKE', "%{$string}%")->get();
-    }
+        return $this->getByFilter('receive_messages', $column, $request->value);
     
-    public function sendEmail(Request $request){
-        $message['to_message'] = $request->destino;
-        $message['content_message'] = $request->msg;
-        $message['subject_message'] = $request->sub;
+    }
 
-        DB::table('send_messages')->insert($message);
-        Mail::to($message['to_message'])->send(new SendEmail($message['content_message'], $message['subject_message']));
-        
+    public function filterSended(Request $request, $filtro){
+        switch($filtro) {
+            case 'data':
+                $column = 'sended_message';
+                break;
+            case 'remetente':
+                $column = 'to_message';
+                break;
+            case 'conteudo':
+                $column = 'content_message';
+                break;
+        }
+        return $this->getByFilter('send_messages', $column, $request->value);
+    }
+
+    public function getByFilter($table, $column, $string){
+        return DB::table($table)->where($column, 'LIKE', "%{$string}%")->get();
     }
 }
