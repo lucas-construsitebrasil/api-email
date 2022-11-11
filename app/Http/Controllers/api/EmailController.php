@@ -32,6 +32,7 @@ class EmailController extends Controller
     }
 
     public function getAll(){
+        die('123');
         return ReceiveMessages::all();
     }
 
