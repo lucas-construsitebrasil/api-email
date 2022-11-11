@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\DB;
 use SebastianBergmann\Type\NullType;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendEmail;
+use \Illuminate\Support\Facades\Schema;
 
 class EmailController extends Controller
 {
@@ -27,13 +28,20 @@ class EmailController extends Controller
             'password' => '01052003Cc@',
             'protocol' => 'imap'
         ]);
-        $client->connect();
-        $this->client = $client;
+        if ($client->connect()){
+            $this->client = $client;
+        } else {
+            echo ('Não foi possível conectar, verifique as credenciais');
+        }
     }
 
     public function getAll(){
-        die('123');
-        return ReceiveMessages::all();
+        $todasMsg = ReceiveMessages::all();
+        if ($todasMsg){
+            return $todasMsg;
+        } else {
+            echo('Falha ao buscar todos Emails');
+        }
     }
 
     public function storeEmails(){ 
@@ -50,19 +58,29 @@ class EmailController extends Controller
                     $received['from_fullname_message'] = $attributes['from']->values[0]->personal;
                     $received['html_message'] = $message->getHTMLBody();
                     $received['folder_message'] = $folder->path;
-                    $received['received_message'] = $attributes['delivery_date']->values[0];
+                    $received['received_message'] = $message->getDate()->toString();
                     DB::table('receive_messages')->insert($received);
+                } else {
+                    echo('Não há emails novos');
                 }
             }
         }
+    }
+
+    private function storeSendedEmails($message){
+        if (DB::table('send_messages')->insert($message)){
+            return true;
+        }
+        
+        return 'Tabela não existe';
     }
 
     public function sendEmail(Request $request){
         $message['to_message'] = $request->destino;
         $message['content_message'] = $request->msg;
         $message['subject_message'] = $request->sub;
-
-        DB::table('send_messages')->insert($message);
+        $message['created_at'] = \Carbon\Carbon::now();
+        $this->storeSendedEmails($message);
         Mail::to($message['to_message'])->send(new SendEmail($message['content_message'], $message['subject_message']));
     }
 
@@ -77,9 +95,10 @@ class EmailController extends Controller
             case 'conteudo':
                 $column = 'html_message';
                 break;
+            default:
+                echo "Tipo de filtro não encontrado";
         }
         return $this->getByFilter('receive_messages', $column, $request->value);
-    
     }
 
     public function filterSended(Request $request, $filtro){
@@ -93,11 +112,17 @@ class EmailController extends Controller
             case 'conteudo':
                 $column = 'content_message';
                 break;
+            default:
+                echo "Tipo de filtro não encontrado";
         }
         return $this->getByFilter('send_messages', $column, $request->value);
     }
 
     public function getByFilter($table, $column, $string){
-        return DB::table($table)->where($column, 'LIKE', "%{$string}%")->get();
+        if (DB::table($table)->where($column, 'LIKE', "%{$string}%")->exists()){
+            return DB::table($table)->where($column, 'LIKE', "%{$string}%")->get();
+        } else {
+            echo('0 Registros encontrados');
+        }
     }
 }
