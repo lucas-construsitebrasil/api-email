@@ -46,12 +46,14 @@ class EmailController extends Controller
 
     public function storeEmails(){ 
         $folders = $this->client->getFolders();
+        $i = 0;
         foreach($folders as $folder) {
-            $messages = $folder->messages()->all()->get();
-            foreach ($messages as $message){
-                $attributes = $message->getAttributes();
-                if (DB::table('receive_messages')->where('email_id_message', $attributes['uid'])->first() == NULL){
-                    $received = array();
+            $query = $folder->messages();
+            $uids = $query->all()->getAllUids()->getItems();
+            foreach ($uids as $uid) {
+                if (DB::table('receive_messages')->where('email_id_message', $uid)->first() == NULL){
+                    $message = $query->getMessageByUid($uid);
+                    $attributes = $message->getAttributes();
                     $received['email_id_message'] = $attributes['uid'];
                     $received['subject_message'] = $message->getSubject();
                     $received['from_mail_message'] = $attributes['from']->values[0]->mail;
@@ -60,11 +62,11 @@ class EmailController extends Controller
                     $received['folder_message'] = $folder->path;
                     $received['received_message'] = $message->getDate()->toString();
                     DB::table('receive_messages')->insert($received);
-                } else {
-                    echo('Não há emails novos');
+                    $i++;     
                 }
             }
         }
+        return response()->json(ReceiveMessages::all());
     }
 
     private function storeSendedEmails($message){
