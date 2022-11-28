@@ -15,7 +15,7 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/email/listar', [EmailController::class, 'storeEmails']);
+Route::get('/email/listar', [EmailController::class, 'storeEmails']); 
 Route::get('/email/recebidos/filtrar/{filtro}', [EmailController::class, 'filterReceived']);
 Route::get('/email/enviados/filtrar/{filtro}', [EmailController::class, 'filterSended']);
 Route::post('/email/enviar', [EmailController::class, 'sendEmail']);
