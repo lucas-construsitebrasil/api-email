@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Webklex\PHPIMAP\Client;
 use Webklex\PHPIMAP\ClientManager;
 use App\Models\ReceiveMessages;
+use App\Models\SendMessages;
 use Webklex\PHPIMAP\Query\WhereQuery;
 use Illuminate\Support\Facades\DB;
 use SebastianBergmann\Type\NullType;
@@ -35,21 +36,11 @@ class EmailController extends Controller
         }
     }
 
-    public function getAll(){
-        $todasMsg = ReceiveMessages::all();
-        if ($todasMsg){
-            return $todasMsg;
-        } else {
-            echo('Falha ao buscar todos Emails');
-        }
-    }
-
     public function storeEmails(){ 
         $folders = $this->client->getFolders();
-        $i = 0;
         foreach($folders as $folder) {
             $query = $folder->messages();
-            $uids = $query->all()->getAllUids()->getItems();
+            $uids = $this->client->getConnection()->search(["ALL"], $query->getSequence());
             foreach ($uids as $uid) {
                 if (DB::table('receive_messages')->where('email_id_message', $uid)->first() == NULL){
                     $message = $query->getMessageByUid($uid);
@@ -61,12 +52,11 @@ class EmailController extends Controller
                     $received['html_message'] = $message->getHTMLBody();
                     $received['folder_message'] = $folder->path;
                     $received['received_message'] = $message->getDate()->toString();
-                    DB::table('receive_messages')->insert($received);
-                    $i++;     
+                    DB::table('receive_messages')->insert($received);    
                 }
             }
         }
-        return response()->json(ReceiveMessages::all());
+        return response()->json(ReceiveMessages::orderby('id', 'DESC')->get());
     }
 
     private function storeSendedEmails($message){
@@ -84,6 +74,10 @@ class EmailController extends Controller
         $message['created_at'] = \Carbon\Carbon::now();
         $this->storeSendedEmails($message);
         Mail::to($message['to_message'])->send(new SendEmail($message['content_message'], $message['subject_message']));
+    }
+
+    public function getAllSendedEmails(){
+        return response()->json(SendMessages::orderby('id', 'DESC')->get());
     }
 
     public function filterReceived(Request $request, $filtro){
