@@ -74,7 +74,7 @@ class EmailController extends Controller
             return true;
         }
         
-        return 'Tabela não existe';
+        return response()->json('Tabela não existe');
     }
 
     public function sendEmail(Request $request){
