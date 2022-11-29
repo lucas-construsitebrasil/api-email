@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\api\EmailController;
+use App\Http\Controllers\Email\EmailController;
+use App\Http\Controllers\Email\ReceivedEmailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,15 +16,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-//Route::get('/email/listar', [EmailController::class, 'storeEmails']); 
-//Route::get('/email/recebidos/filtrar/{filtro}', [EmailController::class, 'filterReceived']);
-//Route::get('/email/enviados/filtrar/{filtro}', [EmailController::class, 'filterSended']);
-//Route::post('/email/enviar', [EmailController::class, 'sendEmail']);
-
 Route::group(['prefix' => 'email'], function () {
     Route::prefix('received/')->name('received')->group(function () {
-        Route::get('', [EmailController::class, 'storeEmails'])->name('storeEmails');
-        Route::get('{filtro}', [EmailController::class, 'filterReceived'])->name('filterReceived');
+        Route::get('', [ReceivedEmailController::class, 'index'])->name('index');
+        Route::get('/filtro', [ReceivedEmailController::class, 'show'])->name('show');
     });
     Route::prefix('send/')->name('send')->group(function () {
         Route::get('', [EmailController::class, 'getAllSendedEmails'])->name('getAllSendedEmails');
