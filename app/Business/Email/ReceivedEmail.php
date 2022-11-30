@@ -77,13 +77,16 @@ class ReceivedEmail
 
     public function getByFilter($table, $data){
         $query = '';
+        $i = 0;
         foreach ($data as $key => $value){
             if ($value != ''){
-                $query .= " AND ".$key." LIKE '".$value."%'";
+                $where = ($i==0) ? 'WHERE' : 'AND';
+                $query .= " $where ".$key." LIKE '".$value."%'";
+                $i++;
             }
             
         }
-        return DB::select('select * from ' . $table . ' where 1=1 '. $query);
+        return DB::select('select * from ' . $table . '' .$query);
         
     }
     
