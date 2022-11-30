@@ -84,6 +84,7 @@ class ReceivedEmail
                 $query .= " $where ".$key." LIKE '".$value."%'";
                 $i++;
             }
+            
         }
         return DB::select('select * from ' . $table . '' .$query);
         
