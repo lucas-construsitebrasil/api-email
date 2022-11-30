@@ -44,7 +44,13 @@ class ReceivedEmail
 
     private function filterReceived($request){
         $filtros = $request->only('data', 'remetente', 'conteudo');
-        return $this->getByFilter('receive_messages', $filtros);  
+        $data = [
+            'received_message' => $filtros['data'] ?? '' ,
+            'from_fullname_message' => $filtros['remetente'] ?? '',
+            'html_message' => $filtros['conteudo'] ?? '' 
+        
+        ];
+        return $this->getByFilter('receive_messages', $data);  
         /*switch($filtros) {
             case 'data':
                 $column = 'received_message';
@@ -61,17 +67,24 @@ class ReceivedEmail
         
     }
     
-    public function getByFilter($table, $filtros){
+    /*public function getByFilter($table, $filtros){
         foreach ($filtros as $key => $value){
             if ($key == 'data'){
-                $column = 'received_message';
+                return DB::table($table)->where('received_message', 'LIKE', "%{$value}%")->exists();
             }
         }
-        if (DB::table($table)->where($column, 'LIKE', "%{$string}%")->exists()){
-            return DB::table($table)->where($column, 'LIKE', "%{$string}%")->get();
-        } else {
-            return response()->json('0 Registros encontrados');
+    }*/
+
+    public function getByFilter($table, $data){
+        $query = '';
+        foreach ($data as $key => $value){
+            if ($value != ''){
+                $query .= " AND ".$key." LIKE '".$value."%'";
+            }
+            
         }
+        return DB::select('select * from ' . $table . ' where 1=1 '. $query);
+        
     }
     
     private $username = 'caio.magalhaes@construsitebrasil.com.br';
