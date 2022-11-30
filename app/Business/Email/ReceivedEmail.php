@@ -44,16 +44,12 @@ class ReceivedEmail
 
     private function filterReceived($request){
         $filtros = $request->only('data', 'remetente', 'conteudo');
-        foreach ($filtros as $key => $value){
-            if ($key == 'data'){
-                $column = 'received_message';
-            }  
-        }
+        return $this->getByFilter('receive_messages', $filtros);  
         /*switch($filtros) {
             case 'data':
                 $column = 'received_message';
                 break;
-            case 'remetente':
+                case 'remetente':
                 $column = 'from_fullname_message';
                 break;
             case 'conteudo':
@@ -62,14 +58,19 @@ class ReceivedEmail
             default:
                 echo "Tipo de filtro não encontrado";
         }*/
-        return $this->getByFilter('receive_messages', $column, $request->data);
+        
     }
     
-    public function getByFilter($table, $column, $string){
+    public function getByFilter($table, $filtros){
+        foreach ($filtros as $key => $value){
+            if ($key == 'data'){
+                $column = 'received_message';
+            }
+        }
         if (DB::table($table)->where($column, 'LIKE', "%{$string}%")->exists()){
             return DB::table($table)->where($column, 'LIKE', "%{$string}%")->get();
         } else {
-            echo('0 Registros encontrados');
+            return response()->json('0 Registros encontrados');
         }
     }
     
