@@ -23,8 +23,6 @@ class EmailRequest extends FormRequest
      */
     public function rules()
     {
-        return [
-            'data' => ['required']
-        ];
+        return [];
     }
 }
