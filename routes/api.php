@@ -1,6 +1,7 @@
 <?php
 
-use App\Http\Controllers\Email\EmailController;
+use App\Http\Controllers\Email\SendedEmailController;
+use App\Http\Controllers\Email\SendMessageController;
 use App\Http\Controllers\Email\ReceivedEmailController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -22,9 +23,9 @@ Route::group(['prefix' => 'email'], function () {
         Route::get('/filtro', [ReceivedEmailController::class, 'show'])->name('show');
     });
     Route::prefix('send/')->name('send')->group(function () {
-        Route::get('', [EmailController::class, 'getAllSendedEmails'])->name('getAllSendedEmails');
-        Route::get('{filtro}', [EmailController::class, 'filterSended'])->name('filterSended');
-        Route::post('', [EmailController::class, 'sendEmail'])->name('sendEmail');
+        Route::get('', [SendedEmailController::class, 'index'])->name('index');
+        Route::get('/filtro', [SendedEmailController::class, 'show'])->name('show');
+        Route::post('', [SendMessageController::class, 'store'])->name('store');
     });
 });
 

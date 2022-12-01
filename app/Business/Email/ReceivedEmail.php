@@ -5,6 +5,7 @@ use App\Business\Business;
 use App\Http\Controllers\UserEmailController;
 use Illuminate\Support\Facades\DB;
 use App\Models\ReceiveMessages;
+use App\Business\Email\FilterEmail;
 
 class ReceivedEmail
 {
@@ -16,7 +17,7 @@ class ReceivedEmail
     }
 
     public function show($request){
-        return $this->filterReceived($request);
+        return (new FilterEmail('receive_messages'))->filter($request, 'receive_messages');
     }
 
     private function storeEmails(){ 
@@ -40,54 +41,6 @@ class ReceivedEmail
                 }
             }
         }
-    }
-
-    private function filterReceived($request){
-        $filtros = $request->only('data', 'remetente', 'conteudo');
-        $data = [
-            'received_message' => $filtros['data'] ?? '' ,
-            'from_fullname_message' => $filtros['remetente'] ?? '',
-            'html_message' => $filtros['conteudo'] ?? '' 
-        
-        ];
-        return $this->getByFilter('receive_messages', $data);  
-        /*switch($filtros) {
-            case 'data':
-                $column = 'received_message';
-                break;
-                case 'remetente':
-                $column = 'from_fullname_message';
-                break;
-            case 'conteudo':
-                $column = 'html_message';
-                break;
-            default:
-                echo "Tipo de filtro não encontrado";
-        }*/
-        
-    }
-    
-    /*public function getByFilter($table, $filtros){
-        foreach ($filtros as $key => $value){
-            if ($key == 'data'){
-                return DB::table($table)->where('received_message', 'LIKE', "%{$value}%")->exists();
-            }
-        }
-    }*/
-
-    public function getByFilter($table, $data){
-        $query = '';
-        $i = 0;
-        foreach ($data as $key => $value){
-            if ($value != ''){
-                $where = ($i==0) ? 'WHERE' : 'AND';
-                $query .= " $where ".$key." LIKE '".$value."%'";
-                $i++;
-            }
-            
-        }
-        return DB::select('select * from ' . $table . '' .$query);
-        
     }
     
     private $username = 'caio.magalhaes@construsitebrasil.com.br';
