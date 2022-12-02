@@ -21,7 +21,7 @@ class ReceivedEmail
     }
 
     private function storeEmails(){ 
-        $user = new UserEmailController($this->username, $this->password);
+        $user = new UserEmailController();
         $folders = $user->getClient()->getFolders();
         foreach($folders as $folder) {
             $query = $folder->messages();
@@ -42,8 +42,4 @@ class ReceivedEmail
             }
         }
     }
-    
-    private $username = 'caio.magalhaes@construsitebrasil.com.br';
-    private $password = '01052003Cc@';
-
 }

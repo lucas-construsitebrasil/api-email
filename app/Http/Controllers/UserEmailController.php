@@ -11,14 +11,14 @@ class UserEmailController extends Controller
 {
     private $client;
 
-    public function __construct($username, $password){
+    public function __construct(){
         $client = (new ClientManager($options = []))->make([
             'host' => 'mail.construsitebrasil.com.br',
             'port' => '993',
             'encryption' => 'TLS',
             'validade_cert' => true,
-            'username' => $username,
-            'password' => $password,
+            'username' => $this->username,
+            'password' => $this->password,
             'protocol' => 'imap'
         ]);
         if ($client->connect()){
@@ -31,4 +31,7 @@ class UserEmailController extends Controller
     public function getClient(){
         return $this->client;
     }
+
+    private $username = 'caio.magalhaes@construsitebrasil.com.br';
+    private $password = '01052003Cc@';
 }

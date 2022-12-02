@@ -14,8 +14,4 @@ class SendedEmailController extends Controller
     public function show(EmailRequest $request){
         return response()->json($this->business->show($request));
     }
-
-    public function sendEmail(EmailRequest $request){
-        return response()->json($this->business->sendEmail($request));
-    }
 }
