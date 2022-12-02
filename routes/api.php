@@ -20,10 +20,13 @@ use Illuminate\Support\Facades\Route;
 Route::group(['prefix' => 'email'], function () {
     Route::prefix('received/')->name('received')->group(function () {
         Route::get('', [ReceivedEmailController::class, 'index'])->name('index');
+        // Está em português
         Route::get('/filtro', [ReceivedEmailController::class, 'show'])->name('show');
     });
     Route::prefix('send/')->name('send')->group(function () {
+        // Está em português
         Route::get('', [SendedEmailController::class, 'index'])->name('index');
+        // Está em português
         Route::get('/filtro', [SendedEmailController::class, 'show'])->name('show');
         Route::post('', [SendMessageController::class, 'store'])->name('store');
     });

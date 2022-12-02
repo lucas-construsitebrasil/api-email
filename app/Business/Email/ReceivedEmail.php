@@ -19,15 +19,15 @@ class ReceivedEmail
     public function show($request){
         return (new FilterEmail('receive_messages'))->filter($request, 'receive_messages');
     }
-
     private function storeEmails(){ 
         $user = new UserEmailController($this->username, $this->password);
         $folders = $user->getClient()->getFolders();
-        foreach($folders as $folder) {
+        foreach($folders as $folder) { // Sem necessidade desse foreach, mensagens só chegam na caixa de entrada
             $query = $folder->messages();
             $uids = $user->getClient()->getConnection()->search(["ALL"], $query->getSequence());
             foreach ($uids as $uid) {
                 if (DB::table('receive_messages')->where('email_id_message', $uid)->first() == NULL){
+                    // Eu colocaria esse if em um outro método canDowloadMessage
                     $message = $query->getMessageByUid($uid);
                     $attributes = $message->getAttributes();
                     $received['email_id_message'] = $attributes['uid'];

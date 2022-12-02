@@ -11,11 +11,13 @@ class SendMessage {
     private $fields;
 
     public function store($request){
+        // Não está retornando se foi salvo ou não
         $this->setFields($request);
         $this->sendEmail();
     }
 
     public function sendEmail(){
+        // Sem tratativa de erros, e se o e-mail for inválido? Ele vai ser considerado como enviado mesmo assim?
         $this->storeSendedEmails();
         Mail::to($this->fields['to_message'])->send(new SendEmail($this->fields['content_message'], $this->fields['subject_message']));
     }

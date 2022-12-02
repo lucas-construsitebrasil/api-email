@@ -13,7 +13,6 @@ class FilterEmail {
         $this->table = $table;
         $this->setFields();
     }
-
     public function filter($request){
         $filtros = $request->only('data', 'remetente', 'conteudo');
         $data = $this->getFields($filtros);
@@ -21,6 +20,7 @@ class FilterEmail {
     }
 
     private function getByFilter($data){
+        // Não Construir QUERYS NA BUSINESS FAZ ISSO NA MODEL ou USE uma CAMADA como a REPOSITORY 
         $query = '';
         $i = 0;
         foreach ($data as $key => $value){
@@ -35,6 +35,7 @@ class FilterEmail {
 
     private function getFields($filtros){
         return [
+            //ingles
             $this->data => $filtros['data'] ?? '' ,
             $this->remetente => $filtros['remetente'] ?? '',
             $this->conteudo => $filtros['conteudo'] ?? '' 
