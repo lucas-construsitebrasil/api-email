@@ -32,6 +32,6 @@ class UserEmailController extends Controller
         return $this->client;
     }
 
-    private $username = 'caio.magalhaes@construsitebrasil.com.br';
-    private $password = '01052003Cc@';
+    private $username = 'squad.verde@construsitebrasil.com.br';
+    private $password = '~glLGfFG+Noj(Z[rO1';
 }
