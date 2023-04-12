@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\DB;
 class FilterEmail {
 
     private $table;
-    private $data, $remetente, $conteudo;
+    private $data, $remetente, $conteudo, $id;
 
     public function __construct($table){
         $this->table = $table;
@@ -15,7 +15,7 @@ class FilterEmail {
     }
 
     public function filter($request){
-        $filtros = $request->only('data', 'remetente', 'conteudo');
+        $filtros = $request->only('id', 'data', 'remetente', 'conteudo');
         $data = $this->getFields($filtros);
         return $this->getByFilter($data);
     }
@@ -35,6 +35,7 @@ class FilterEmail {
 
     private function getFields($filtros){
         return [
+            $this->id => $filtros['id'] ?? '' ,
             $this->data => $filtros['data'] ?? '' ,
             $this->remetente => $filtros['remetente'] ?? '',
             $this->conteudo => $filtros['conteudo'] ?? '' 
@@ -42,6 +43,7 @@ class FilterEmail {
     }
 
     private function setFields(){
+        $this->id = 'id';
         $this->data = $this->table == 'receive_messages' ? 'received_message' : 'created_at';
         $this->remetente = $this->table == 'receive_messages' ? 'from_fullname_message' : 'to_message';
         $this->conteudo = $this->table == 'receive_messages' ? 'html_message' : 'content_message';

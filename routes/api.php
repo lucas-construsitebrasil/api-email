@@ -21,6 +21,7 @@ Route::group(['prefix' => 'email'], function () {
     Route::prefix('received/')->name('received')->group(function () {
         Route::get('', [ReceivedEmailController::class, 'index'])->name('index');
         Route::get('/filtro', [ReceivedEmailController::class, 'show'])->name('show');
+        
     });
     Route::prefix('send/')->name('send')->group(function () {
         Route::get('', [SendedEmailController::class, 'index'])->name('index');
